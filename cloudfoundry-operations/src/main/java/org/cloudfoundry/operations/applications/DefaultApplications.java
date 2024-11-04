@@ -156,6 +156,7 @@ import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
 import org.cloudfoundry.logcache.v1.EnvelopeType;
+import org.cloudfoundry.logcache.v1.Log;
 import org.cloudfoundry.logcache.v1.LogCacheClient;
 import org.cloudfoundry.logcache.v1.ReadRequest;
 import org.cloudfoundry.operations.util.OperationsLogging;
@@ -203,7 +204,7 @@ public final class DefaultApplications implements Applications {
             Comparator.comparing(LogMessage::getTimestamp);
 
     private static final Comparator<org.cloudfoundry.logcache.v1.Envelope> LOG_MESSAGE_COMPARATOR_LOG_CACHE =
-            Comparator.comparing(org.cloudfoundry.logcache.v1.Envelope::getTimestamp);
+            Comparator.comparing(org.cloudfoundry.logcache.v1.Envelope::getTimestamp).compare()
 
     private static final Duration LOG_MESSAGE_TIMESPAN = Duration.ofMillis(500);
 
@@ -1597,6 +1598,7 @@ public final class DefaultApplications implements Applications {
         return requestLogsRecentLogCache(logCacheClient, applicationId)
                 .filter(e -> EnvelopeType.LOG.getValue().equals(e.getLog().getType().getValue()))
                 .map(org.cloudfoundry.logcache.v1.Envelope::getLog)
+                .map(Log::getPayload)
                 .collectSortedList(LOG_MESSAGE_COMPARATOR_LOG_CACHE)
                 .flatMapIterable(d -> d);
     }
