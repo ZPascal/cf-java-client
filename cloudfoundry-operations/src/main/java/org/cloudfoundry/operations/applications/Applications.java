@@ -127,7 +127,10 @@ public interface Applications {
     Flux<LogMessage> logs(LogsRequest request);
 
     /**
-     * List the applications logs. Uses Log Cache under the hood.
+     * List the applications logs.
+     * Uses Log Cache under the hood when {@link ApplicationLogsRequest#getRecent()} is {@code true}.
+     * Streaming logs still use Doppler, which is not available in deployments following
+     * <a href="https://docs.cloudfoundry.org/loggregator/architecture.html#shared-nothing-architecture">shared-nothing architecture</a>.
      *
      * @param request the application logs request
      * @return the applications logs
